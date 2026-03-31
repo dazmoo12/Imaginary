@@ -49,6 +49,12 @@ Erkannt und eingerichtet:
 powershell -ExecutionPolicy Bypass -File .\scripts\start_local.ps1
 ```
 
+Oder einfacher per Doppelklick:
+
+```text
+start-local.cmd
+```
+
 Danach im Browser:
 
 ```text
@@ -59,6 +65,12 @@ http://127.0.0.1:7860
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\start_lan.ps1
+```
+
+Oder einfacher per Doppelklick:
+
+```text
+start-lan.cmd
 ```
 
 Dann die angezeigte `http://<deine-ip>:7860`-Adresse auf dem Smartphone im gleichen WLAN oeffnen.

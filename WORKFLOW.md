@@ -137,6 +137,7 @@ Teilweise erledigt:
 - Bild-Lite-Pfade erfolgreich getestet
 - kleiner T2V-Pfad erfolgreich getestet
 - groessere Video- und I2V-Pfade noch offen
+- I2V 14B auf aktueller Hardware vorlaeufig als Heavy/Experimentell eingeordnet
 
 ### 2. Performanceprofile
 

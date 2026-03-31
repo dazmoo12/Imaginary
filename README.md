@@ -56,6 +56,7 @@ Bereits umgesetzt:
 - `Wan2.1 T2V 1.3B` erfolgreich als kleiner lokaler Text-zu-Video-Smoke-Test ausgefuehrt
 - Startskripte laufen im Offline-/Cache-Modus fuer den fertigen lokalen Betrieb
 - Offline-Runtime fuer den App-eigenen Text-zu-Video-Pfad erfolgreich verifiziert
+- schwere `I2V 14B`-Profile sind fuer `GTX 1080 8GB` derzeit als `Heavy/Experimentell` einzuordnen
 
 Noch nicht voll validiert:
 - echter Download aller grossen Modelle
@@ -116,6 +117,20 @@ Danach im Browser:
 http://127.0.0.1:7860
 ```
 
+### Einfacher Windows-Start ohne PowerShell-Aktivierung
+
+Per Doppelklick oder in `cmd`:
+
+```text
+start-local.cmd
+```
+
+Fuer Android/LAN:
+
+```text
+start-lan.cmd
+```
+
 ### Android-Zugriff im gleichen Netzwerk
 
 Wenn du die App vom Android-Smartphone aus nutzen willst:
@@ -150,6 +165,64 @@ Spezifisch fuer die aktuell erkannte Hardware:
 - `SDXL Turbo Lite` ist auf dieser Hardware bereits erfolgreich end-to-end bestaetigt
 - `Wan2.1 T2V 1.3B` laeuft als reduzierter Smoke-Test lokal, ist aber deutlich langsamer als die Bildpfade
 - fuer die App sind konservative Video-Defaults gesetzt: 4 Schritte, 9 Frames, 8 FPS
+
+Praktische Einstufung fuer diese Karte:
+- `SDXL Turbo Lite`: gut geeignet
+- `FLUX.2 klein 4B`: moeglich, aber deutlich schwerer
+- `Wan2.1 T2V 1.3B`: machbar als kleiner lokaler Videopfad
+- `Wan2.1 I2V 14B`: eher Heavy/Experimentell statt alltagstauglicher Standard
+
+## Modellunterschiede in der Praxis
+
+### Bildmodelle
+
+- `SDXL Turbo Lite`
+  - schnellster und leichtester Pfad im Projekt
+  - gut fuer Entwuerfe, Android-Lite-Ideen und erste lokale Tests
+  - schwacher bei Praezision und komplexen Bearbeitungen als die FLUX-Modelle
+
+- `FLUX.2 klein 4B`
+  - moderneres offenes Bildmodell
+  - besser fuer hochwertige Text-zu-Bild- und Bild-zu-Bild-Ergebnisse
+  - schwerer als `SDXL Turbo Lite`
+
+- `FLUX.1 Kontext [dev]`
+  - staerker bei instruktionbasierten Aenderungen und Inpainting
+  - gut fuer gezielte Bildbearbeitung
+  - schwerer und zudem non-commercial lizenziert
+
+### Videomodelle
+
+- `Wan2.1 T2V 1.3B`
+  - kleinstes sinnvolles offenes Video-Modell in unserem Stack
+  - daher unser aktueller realistischer Einstieg fuer deine Hardware
+  - trotzdem viel schwerer und langsamer als Bildmodelle
+
+- `Wan2.1 T2V 14B`
+  - deutlich groesser und qualitativ staerker
+  - gedacht fuer groessere GPUs
+  - auf deiner Karte eher kein Standardworkflow
+
+- `Wan2.1 I2V 14B`
+  - Bild-zu-Video ist zusaetzlich schwerer als Text-zu-Video, weil zum Prompt noch das Eingabebild konsistent verarbeitet werden muss
+  - das Modell ist gross und speicherhungrig
+  - deshalb auf `GTX 1080 8GB` eher experimentell
+
+## Warum Video so viel laenger dauert als Bild
+
+Das ist leider normal.
+
+Bei Bildmodellen entsteht genau ein Bild.
+Bei Videomodellen muessen dagegen viele Frames erzeugt und zeitlich konsistent gehalten werden.
+
+Das bedeutet praktisch:
+- mehr Rechenschritte
+- mehr Speicherbedarf
+- mehr Daten beim ersten Download
+- laengeres Laden grosser Gewichte
+- zusaetzliche Verarbeitung bei Bild-zu-Video
+
+Deshalb fuehlen sich selbst kleine Video-Tests oft unverhaeltnismaessig langsam an, besonders auf aelteren 8-GB-Karten.
 
 ## Android-Strategie
 
