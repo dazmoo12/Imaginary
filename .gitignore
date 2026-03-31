@@ -1,0 +1,16 @@
+.venv/
+.uv-cache/
+.tmp/
+__pycache__/
+imaginary_ai/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+outputs/
+artifacts/
+datasets/*/raw/
+datasets/*/curated/
+datasets/*/captions/
+datasets/*/eval/
+.DS_Store
+Thumbs.db

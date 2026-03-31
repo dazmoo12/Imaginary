@@ -1,0 +1,16 @@
+base_model = "black-forest-labs/FLUX.2-klein-4B"
+training_type = "lora"
+dataset_dir = "datasets/example_style/curated"
+captions_dir = "datasets/example_style/captions"
+output_dir = "artifacts/lora/example_style"
+resolution = 1024
+learning_rate = 1e-4
+train_steps = 2000
+rank = 16
+alpha = 16
+caption_dropout = 0.05
+seed = 42
+
+[notes]
+purpose = "Example configuration for later style-strengthening runs."
+evaluation_set = "datasets/example_style/eval"
