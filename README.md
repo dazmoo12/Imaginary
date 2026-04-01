@@ -105,6 +105,20 @@ uv pip install --python .venv\Scripts\python.exe -r requirements-gpu-modern-cu12
 $env:HF_TOKEN="dein_token"
 ```
 
+Oder dauerhaft projektlokal:
+
+```text
+.env
+```
+
+Beispiel:
+
+```text
+HF_TOKEN=hf_your_token_here
+```
+
+Eine Vorlage liegt in [.env.example](C:/Users/Mo/Projects/Imaginary/.env.example).
+
 ### 3. App starten
 
 ```powershell
@@ -131,7 +145,38 @@ Fuer Android/LAN:
 start-lan.cmd
 ```
 
+Benutzerfreundliche Launcher fuer den Alltag:
+
+```text
+Imaginary Local AI.cmd
+Imaginary LAN AI.cmd
+```
+
+Diese Dateien:
+- starten die App
+- oeffnen automatisch den Browser
+- nutzen auf diesem Geraet bevorzugt die privaten Starter mit lokal hinterlegtem Token, falls vorhanden
+
+Die Oberfläche bietet bereits:
+- ein einfaches Prompt-Feld fuer `Text zu Bild`
+- Drag & Drop fuer Bilder bei `Bild zu Bild` und `Bild zu Video`
+- Modellwahl pro Modus direkt in der UI
+
 ### Android-Zugriff im gleichen Netzwerk
+
+## Welche Datei starte ich?
+
+Fuer den normalen Alltag auf diesem privaten Geraet:
+- [Imaginary Local AI.cmd](C:/Users/Mo/Projects/Imaginary/Imaginary%20Local%20AI.cmd)
+
+Fuer Zugriff vom Android-Smartphone im gleichen Netzwerk:
+- [Imaginary LAN AI.cmd](C:/Users/Mo/Projects/Imaginary/Imaginary%20LAN%20AI.cmd)
+
+Technischer Hintergrund:
+- beide Launcher starten die Gradio-App
+- beide oeffnen den Browser automatisch
+- gerechnet wird immer auf deinem PC, nicht auf dem Smartphone
+- das Smartphone ist in diesem Setup nur Browser-Client, Fernbedienung und Anzeige
 
 Wenn du die App vom Android-Smartphone aus nutzen willst:
 
@@ -144,6 +189,7 @@ Dann oeffnest du auf dem Smartphone die angezeigte lokale Netzwerkadresse im Bro
 Hinweis:
 - Die Startskripte setzen Offline-Betrieb aus dem lokalen Modellcache.
 - Neue Modelle sollten deshalb zuerst einmal mit Netzwerkzugang vorgeladen werden.
+- Wenn eine `.env` im Projekt liegt, laden die Startskripte `HF_TOKEN` automatisch daraus.
 
 ## Hardware-Einordnung
 
@@ -171,6 +217,61 @@ Praktische Einstufung fuer diese Karte:
 - `FLUX.2 klein 4B`: moeglich, aber deutlich schwerer
 - `Wan2.1 T2V 1.3B`: machbar als kleiner lokaler Videopfad
 - `Wan2.1 I2V 14B`: eher Heavy/Experimentell statt alltagstauglicher Standard
+
+## Modelle in der UI
+
+### Text zu Bild
+
+- `SDXL Turbo Lite`
+  - schnellster lokaler Bildpfad
+  - gut fuer schnelle Entwuerfe, Tests und alltaegliche Nutzung auf deiner `GTX 1080 8GB`
+- `FLUX.2 klein 4B`
+  - qualitativ staerkeres offenes Bildmodell
+  - langsamer und schwerer als `SDXL Turbo Lite`
+
+### Bild zu Bild
+
+- `SDXL Turbo Lite`
+  - schnellster Bildbearbeitungs-Pfad fuer dein aktuelles System
+  - gut fuer Stilvarianten und grobe Umdeutungen vorhandener Bilder
+- `FLUX.2 klein 4B`
+  - staerkere offene Qualitaetsoption fuer Bildbearbeitung
+  - braucht deutlich mehr Ressourcen
+- `FLUX.1 Kontext [dev]`
+  - besonders fuer instruktionbasierte Bearbeitung gedacht
+  - gut, wenn du ein Bild sehr gezielt nach Textanweisung veraendern willst
+- `FLUX.1 Kontext Inpaint [dev]`
+  - wie `FLUX.1 Kontext`, aber zusaetzlich fuer gezielte Teilbereiche per Maske
+  - sinnvoll fuer Austausch, Retusche und Inpainting
+
+### Text zu Video
+
+- `Wan2.1 T2V 1.3B`
+  - kleinstes und praktischstes Video-Modell in diesem Projekt
+  - dein sinnvoller Startpunkt fuer lokale Videotests
+- `Wan2.1 T2V 14B [Heavy]`
+  - deutlich groesser und qualitativ staerker
+  - fuer staerkere GPUs gedacht
+- `Wan2.1 T2V 14B 1080P via Upscaling [Heavy]`
+  - erzeugt intern niedriger und skaliert auf HD hoch
+  - klar als Upscaling-Profil gedacht, nicht als native 1080p-Generierung
+
+### Bild zu Video
+
+- `Wan2.1 I2V 14B 480P [Heavy/Experimentell]`
+  - kreativ starker, aber schwerer Bild-zu-Video-Pfad
+  - auf deiner Hardware eher Test- oder Spezialfall
+- `Wan2.1 I2V 14B 720P [Heavy/Experimentell]`
+  - noch anspruchsvoller
+  - aktuell nicht als Alltagspfad gedacht
+- `Wan2.1 I2V 14B 1080P via Upscaling [Heavy/Experimentell]`
+  - HD-Ausgabe ueber Upscaling
+  - ebenfalls klar als Heavy-/Experimentell-Profil gedacht
+
+Faustregel fuer die Auswahl:
+- `Lite` oder kleine Modelle fuer Alltag, schnelle Versuche und haeufige Nutzung
+- `Heavy` fuer kreative Einzelprojekte, mehr Wartezeit und bessere Hardware
+- `Experimentell` bedeutet: technisch moeglich, aber auf deiner aktuellen GPU nicht als bequemer Standard zu erwarten
 
 ## Modellunterschiede in der Praxis
 
@@ -207,6 +308,67 @@ Praktische Einstufung fuer diese Karte:
   - Bild-zu-Video ist zusaetzlich schwerer als Text-zu-Video, weil zum Prompt noch das Eingabebild konsistent verarbeitet werden muss
   - das Modell ist gross und speicherhungrig
   - deshalb auf `GTX 1080 8GB` eher experimentell
+
+## Bedeutung der UI-Parameter
+
+### Allgemeine Parameter
+
+- `Modell`
+  - waehlt das konkrete KI-Modell fuer den jeweiligen Modus aus
+  - bestimmt vor allem Qualitaet, Geschwindigkeit und Hardwarebedarf
+
+- `Prompt`
+  - deine Textanweisung an das Modell
+  - beschreibt Motiv, Stil, Licht, Stimmung, Kameraeindruck oder Aenderungswunsch
+
+- `Seed`
+  - Startwert fuer den Zufall
+  - gleicher Seed plus gleiche Einstellungen ergibt meist sehr aehnliche Ergebnisse
+  - anderer Seed erzeugt Varianten
+
+### Bild-Parameter
+
+- `Inference Steps`
+  - Anzahl der Rechenschritte pro Bild
+  - mehr Schritte koennen sauberere Ergebnisse bringen, kosten aber Zeit
+
+- `Guidance`
+  - wie stark sich das Modell an deinen Prompt haelt
+  - hoeher bedeutet meist strengere Prompt-Treue
+  - zu hoch kann Ergebnisse aber unnatuerlich wirken lassen
+
+- `Strength`
+  - nur fuer Bearbeitungsmodi mit Ausgangsbild relevant
+  - bestimmt, wie stark das Originalbild veraendert wird
+  - niedrig = nah am Original
+  - hoch = staerkere Umgestaltung
+
+- `Ausgangsbild`
+  - das per Drag & Drop geladene Bild
+  - dient bei `Bild zu Bild` und `Bild zu Video` als Grundlage
+
+- `Maske`
+  - nur fuer Inpainting-Modelle relevant
+  - markiert gezielt die Bildbereiche, die veraendert werden sollen
+
+### Video-Parameter
+
+- `Frames`
+  - Anzahl der erzeugten Einzelbilder des Clips
+  - mehr Frames bedeuten meist laengere oder etwas fluessigere Videos, aber deutlich mehr Rechenzeit
+
+- `FPS`
+  - Wiedergabegeschwindigkeit in Bildern pro Sekunde
+  - hoehere FPS wirken fluessiger
+  - bei gleicher Framezahl wird der Clip dadurch kuerzer
+
+Praktische Lesart fuer dein System:
+- `Inference Steps` = Qualitaet gegen Zeit
+- `Guidance` = Prompt-Treue
+- `Strength` = Eingriff ins Ausgangsbild
+- `Frames` = Hauptkostentreiber bei Video
+- `FPS` = Wiedergabegeschwindigkeit
+- `Seed` = Variantenregler
 
 ## Warum Video so viel laenger dauert als Bild
 

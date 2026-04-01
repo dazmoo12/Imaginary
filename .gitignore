@@ -3,6 +3,10 @@
 .tmp/
 __pycache__/
 imaginary_ai/__pycache__/
+.env
+.env.*
+start-local-private.cmd
+start-lan-private.cmd
 *.pyc
 *.pyo
 *.pyd

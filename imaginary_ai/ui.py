@@ -1,4 +1,5 @@
 import gradio as gr
+from pathlib import Path
 
 from imaginary_ai.config import DEFAULTS
 from imaginary_ai.config import TASK_MODEL_SPECS
@@ -11,8 +12,35 @@ from imaginary_ai.runtime import generate_video
 MANAGER = PipelineManager()
 
 
+def _repo_cache_dir(repo_id: str) -> Path:
+    cache_root = Path("Y:/ImaginaryData/huggingface/hub")
+    repo_dir = "models--" + repo_id.replace("/", "--")
+    return cache_root / repo_dir
+
+
+def _download_state(repo_id: str) -> str:
+    repo_cache = _repo_cache_dir(repo_id)
+    snapshots_dir = repo_cache / "snapshots"
+    if snapshots_dir.exists():
+        for snapshot in snapshots_dir.iterdir():
+            if not snapshot.is_dir():
+                continue
+            if (snapshot / "model_index.json").exists():
+                return "local"
+            if list(snapshot.rglob("*.safetensors")):
+                return "local"
+    return "missing"
+
+
+def _display_label(task_type: TaskType, model_key: str) -> str:
+    spec = _spec_map(task_type)[model_key]
+    if _download_state(spec.repo_id) == "local":
+        return spec.label
+    return f"{spec.label} [Noch nicht heruntergeladen]"
+
+
 def _spec_choices(task_type: TaskType):
-    return [(spec.label, spec.key) for spec in TASK_MODEL_SPECS[task_type]]
+    return [(_display_label(task_type, spec.key), spec.key) for spec in TASK_MODEL_SPECS[task_type]]
 
 
 def _spec_map(task_type: TaskType):
@@ -21,6 +49,11 @@ def _spec_map(task_type: TaskType):
 
 def _model_hint(task_type: TaskType, model_key: str) -> str:
     spec = _spec_map(task_type)[model_key]
+    availability = (
+        "Lokal vorhanden"
+        if _download_state(spec.repo_id) == "local"
+        else "Noch nicht heruntergeladen oder kein Zugriff auf das Modell"
+    )
     native_resolution = (
         f"{spec.default_width}x{spec.default_height}" if spec.default_width and spec.default_height else "modellintern"
     )
@@ -29,7 +62,7 @@ def _model_hint(task_type: TaskType, model_key: str) -> str:
     )
     strategy_label = "Upscaling" if spec.render_strategy == "upscale" else "Native Ausgabe"
     return (
-        f"{spec.label} | Lizenz: {spec.license_name} | Empfohlener VRAM: ca. "
+        f"{spec.label} | Status: {availability} | Lizenz: {spec.license_name} | Empfohlener VRAM: ca. "
         f"{spec.recommended_vram_gb} GB | Strategie: {strategy_label} | Native Basis: {native_resolution} | "
         f"Zielausgabe: {target_resolution} | {spec.notes}"
     )

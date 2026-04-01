@@ -86,6 +86,28 @@ class PipelineManager:
             )
         raise ValueError(f"Unsupported video pipeline: {spec.pipeline_class}")
 
+    def _apply_memory_optimizations(self, pipe: Any) -> None:
+        # Favor stability on older 8 GB cards over raw throughput.
+        for method_name, args in (
+            ("enable_attention_slicing", ("max",)),
+            ("enable_vae_slicing", ()),
+            ("enable_vae_tiling", ()),
+            ("enable_forward_chunking", ()),
+            ("enable_model_cpu_offload", ()),
+        ):
+            method = getattr(pipe, method_name, None)
+            if method is None:
+                continue
+            try:
+                method(*args)
+            except TypeError:
+                try:
+                    method()
+                except Exception:
+                    continue
+            except Exception:
+                continue
+
     def get_pipeline(self, spec: ModelSpec):
         cache_key = f"{spec.key}:{spec.pipeline_class}"
         self._clear_if_switching(cache_key)
@@ -110,9 +132,9 @@ class PipelineManager:
             pipe = pipeline_cls.from_pretrained(spec.repo_id, **loader_kwargs)
 
         if device == "cuda":
-            try:
-                pipe.enable_model_cpu_offload()
-            except Exception:
+            self._apply_memory_optimizations(pipe)
+            # Fall back to a direct device move only when offloading is unavailable.
+            if not hasattr(pipe, "hf_device_map"):
                 pipe.to(device)
         else:
             pipe.to(device)
